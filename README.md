@@ -81,14 +81,19 @@ AWS VPC, EC2, Launch Templates, EC2 User Data, Internet Gateway, NAT Gateway, ro
 └── screenshots/
     ├── app1-service-validation.jpg
     ├── app2-service-validation.jpg
+    ├── application-security-group.jpg
     ├── cloudwatch-cpu-alarm.jpg
+    ├── nlb-browser-response.jpg
     ├── nlb-healthy-targets.jpg
     ├── postgresql-db1-query.jpg
+    ├── private-network-acl.jpg
+    ├── private-route-table.jpg
+    ├── public-route-table.jpg
     ├── ssh-to-private-db1.jpg
     └── subnets-across-azs.jpg
 ```
 
-The original course PDF and the author's submission report are not included. The full report contains AWS account/network identifiers and public IP/DNS information in embedded screenshots. Only selected evidence images are included here; they still contain historical internal addresses and AWS resource IDs.
+The original course PDF and the author's submission report are not included. The full report contains AWS account/network identifiers and public IP/DNS information in embedded screenshots. Only selected evidence images are included here. Some show historical internal addresses and AWS resource IDs; the NLB browser screenshot also displays a **retired public load balancer DNS name**. Screenshots containing the AWS account identifier or public EC2 IPv4 addresses were omitted.
 
 ## Implementation summary
 
@@ -106,7 +111,7 @@ The following describes the **completed lab**, not a one-command redeployment pr
 
 ### User Data and systemd
 
-[`scripts/user-data.sh`](scripts/user-data.sh) is a transcription of the full User Data appendix in the author's submission report. The lab's demonstration application was supplied with the course material; this repository documents its configuration and use rather than claiming independent authorship of that Python application. **Confirm that the course provider permits republication of the supplied code before making the repository public.**
+[`scripts/user-data.sh`](scripts/user-data.sh) is a transcription of the full User Data appendix in the author's submission report. The lab's demonstration application was supplied with the course material; this repository documents its configuration and use rather than claiming independent authorship of that Python application. The author confirmed permission to republish the supplied training code.
 
 The script:
 
@@ -136,14 +141,19 @@ The report and selected screenshots show the following checks during the origina
 | Check | Evidence | Recorded result |
 | --- | --- | --- |
 | Subnet placement | [Four subnets](screenshots/subnets-across-azs.jpg) | Two public + two private across both AZs |
+| Public routing | [Public route table](screenshots/public-route-table.jpg) | Default route `0.0.0.0/0` targets the Internet Gateway |
+| Private routing | [Private route table](screenshots/private-route-table.jpg) | Default route `0.0.0.0/0` targets the NAT Gateway |
+| Application Security Group | [Inbound rules](screenshots/application-security-group.jpg) | SSH from Bastion SG and TCP `8002` from NLB SG |
+| Private subnet NACL | [Inbound rules](screenshots/private-network-acl.jpg) | SSH restricted before a broad allow-all rule; rule order matters |
 | App 1 initialization | [App 1 terminal](screenshots/app1-service-validation.jpg) | Cloud-init complete; service enabled/active; port 8002 listening; HTTP response |
 | App 2 initialization | [App 2 terminal](screenshots/app2-service-validation.jpg) | Cloud-init complete; service enabled/active; port 8002 listening; HTTP response |
 | NLB target health | [Target group](screenshots/nlb-healthy-targets.jpg) | **2 healthy, 0 unhealthy** |
+| Browser response through NLB | [Browser output](screenshots/nlb-browser-response.jpg) | Sample application responded through the public NLB DNS with an EC2 hostname |
 | Bastion-to-private-DB access | [DB1 SSH session](screenshots/ssh-to-private-db1.jpg) | Reached DB1's private IP; session originated from Bastion network |
 | PostgreSQL | [DB1 query](screenshots/postgresql-db1-query.jpg) | PostgreSQL active; test query returned expected row |
 | CloudWatch | [CPU alarm](screenshots/cloudwatch-cpu-alarm.jpg) | Threshold set to >70% average CPU for five minutes; initially `INSUFFICIENT_DATA` |
 
-The full report also describes repeated browser/`curl` requests to the NLB endpoint and two distinct application hostnames, plus PostgreSQL testing on DB2. Those details are reported results; the selected public-safe screenshots do not independently show every one of those operations.
+The full report also describes repeated browser/`curl` requests to the NLB endpoint returning two distinct application hostnames, plus PostgreSQL testing on DB2. The browser screenshot above captures one NLB-served response; repeated alternation and DB2 verification remain reported results rather than independently shown in these selected images.
 
 ### Example validation commands used in the lab
 
