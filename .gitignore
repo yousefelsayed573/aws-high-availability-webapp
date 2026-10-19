@@ -1,0 +1,33 @@
+# AWS credentials and SSH private keys
+.aws/
+**/.aws/
+*.pem
+*.ppk
+*.key
+id_rsa*
+id_ed25519*
+*credentials*
+
+# Configuration, secrets, and local environment
+.env
+.env.*
+!.env.example
+*.secret
+*.secrets
+
+# State, local files, and artifacts not part of this documented lab
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+*.log
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+
+# Keep private course materials and unredacted submission reports out of Git
+private/
+reports/
+course-materials/
+originals/
